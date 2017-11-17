@@ -23,4 +23,4 @@ TradeSim提供Web客户端、专用Python客户端等访问方式。
 
 ## 交易API使用说明
 
-请参见API说明文档。
+请参见[TradeApi说明文档](https://github.com/quantOS-org/TradeAPI)。
