@@ -22,7 +22,7 @@
 	msgpack_python
 	python-snappy
 
-可以通过在dataapi程序目录下，执行 pip install -r requirements.txt 一次完成所有依赖的安装。
+可以通过在tradeapi程序目录下，执行 pip install -r requirements.txt 一次完成所有依赖的安装。
 
 也可以通过单个安装完成，例如： pip install pyzmq
 
