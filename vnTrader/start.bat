@@ -1,0 +1,2 @@
+python vtMain.py
+pause
