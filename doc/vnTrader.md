@@ -1,5 +1,7 @@
 ## vnTrader使用帮助
 
+0. 软件下载。请从[这里](https://github.com/quantOS-org/TradeSim/tree/master/vnTrader)下载
+
 1. 请在vnTrader程序目录，通过如下命令启动vnTrader:
 ```shell
 python vtMain.py
