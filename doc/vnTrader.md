@@ -2,8 +2,10 @@
 
 0. 软件下载。
 
-+ 请从[这里](https://github.com/quantOS-org/TradeSim/tree/master/vnTrader)下载
-+ 软件运行需要依赖pyqt4，请从[这个网页](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4)下载相应的版本，并安装。`pip install xxx.whl`
++ 请从[这里](https://github.com/quantOS-org/TradeSim/tree/master/vnTrader)下载vnTrader, 如已下载，请忽略.
++ vnTrader运行需要依赖pyqt4，请从[这个网页](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4)下载相应的版本，并安装。
+
+例如，python2.7环境，64位的机器，请下载PyQt4-4.11.4-cp27-cp27m-win_amd64.whl，执行`pip install PyQt4-4.11.4-cp27-cp27m-win_amd64.whl`，其他平台类推。
 
 1. 请在vnTrader程序目录，通过如下命令启动vnTrader:
 ```shell
