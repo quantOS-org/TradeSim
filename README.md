@@ -14,12 +14,12 @@ TradeSim中的交易系统模块支持多账户管理、多通道交易、实时
 - 支持对历史交易进行PNL分析、绩效归因、数据查询。
 - VN.PY已实现与TradeSim的集成，用户可以通过VN.PY界面进行模拟交易。
 
-## 客户端使用说明
+## 客户端使用
 
 TradeSim提供Web客户端、专用Python客户端等访问方式。
 
-1. Web客户端：请登录[仿真交易](http://www.quantos.org/tradesim/trade.html)后使用。
-2. 专用Python客户端：VN.PY提供了对TradeSim的访问支持，详细使用方法请参看VN.PY官方网站。
+1. Web客户端：请登录[仿真交易](http://www.quantos.org/tradesim/trade.html)后使用。使用帮助参见[https://github.com/quantOS-org/TradeSim/tree/master/doc/webClient.md](https://github.com/quantOS-org/TradeSim/tree/master/doc/webClient.md)
+2. 专用Python客户端：提供vnTrader客户端，请从[这里](https://github.com/quantOS-org/TradeSim/tree/master/vnTrader)下载。使用帮助参见[https://github.com/quantOS-org/TradeSim/tree/master/doc/vnTrader.md](https://github.com/quantOS-org/TradeSim/tree/master/doc/vnTrader.md)
 
 ## 交易API使用说明
 
