@@ -56,6 +56,8 @@ actionMap[(DIRECTION_LONG, OFFSET_CLOSEYESTERDAY)] = "CoverYesterday"
 actionMap[(DIRECTION_SHORT, OFFSET_CLOSEYESTERDAY)] = "SellYesterday"
 actionMap[(DIRECTION_LONG, OFFSET_CLOSETODAY)] = "CoverToday"
 actionMap[(DIRECTION_SHORT, OFFSET_CLOSETODAY)] = "SellToday"
+actionMap[(DIRECTION_LONG, OFFSET_UNKNOWN)] = "AutoLong"
+actionMap[(DIRECTION_SHORT, OFFSET_UNKNOWN)] = "AutoShort"
 actionMapReverse = {v: k for k, v in list(actionMap.items())}
 
 # 交易所类型映射
@@ -301,6 +303,62 @@ class QuantOSTdApi(object):
         for instcode in pf['security']:
             symbols += str(instcode)
             symbols += ","
+        quotes = self.gateway.mdApi.queryQuotes(symbols)
+        
+        for k, d in quotes.items():
+            tick = VtTickData()
+            tick.gatewayName = self.gatewayName
+            
+            instcode = d['symbol']
+            symbol, jzExchange = instcode.split('.')
+            tick.symbol = symbol
+            tick.exchange = exchangeMapReverse[jzExchange]
+            tick.vtSymbol = '.'.join([symbol, jzExchange])
+
+            tick.openPrice = d['open']
+            tick.highPrice = d['high']
+            tick.lowPrice = d['low']
+            tick.volume = d['volume']
+            tick.volchg = 0
+            tick.turnover = d['turnover'] if 'turnover' in d else 0
+            tick.lastPrice = d['last']
+            
+            tick.openInterest = d['oi'] if 'oi' in d else 0
+            tick.preClosePrice = d['preclose'] if 'preclose' in d else 0
+            tick.date = str(d['date'])
+            
+            t = str(d['time'])
+            t = t.rjust(9, '0')
+            tick.time = '%s:%s:%s.%s' %(t[0:2],t[2:4],t[4:6],t[6:])
+            
+            tick.bidPrice1 = d['bidprice1']
+            tick.bidPrice2 = d['bidprice2']
+            tick.bidPrice3 = d['bidprice3']
+            tick.bidPrice4 = d['bidprice4']
+            tick.bidPrice5 = d['bidprice5']
+            
+            tick.askPrice1 = d['askprice1']
+            tick.askPrice2 = d['askprice2']
+            tick.askPrice3 = d['askprice3']
+            tick.askPrice4 = d['askprice4']
+            tick.askPrice5 = d['askprice5']       
+    
+            tick.bidVolume1 = d['bidvolume1']
+            tick.bidVolume2 = d['bidvolume2']
+            tick.bidVolume3 = d['bidvolume3']
+            tick.bidVolume4 = d['bidvolume4']
+            tick.bidVolume5 = d['bidvolume5']
+    
+            tick.askVolume1 = d['askvolume1']
+            tick.askVolume2 = d['askvolume2']
+            tick.askVolume3 = d['askvolume3']
+            tick.askVolume4 = d['askvolume4']
+            tick.askVolume5 = d['askvolume5']   
+            
+            tick.upperLimit = d['limit_up'] if 'limit_up' in d else 0
+            tick.lowerLimit = d['limit_down'] if 'limit_down' in d else 0
+    
+            self.gateway.onTick(tick)            
             
         self.gateway.subscribe(symbols)
                 
@@ -755,27 +813,50 @@ class QuantOSMdApi(object):
         self.gateway.onLog(log)    
         
     #----------------------------------------------------------------------
-    def queryInstruments(self, instcode):
+    def queryInstruments(self, instcodes):
 
-        p = "symbol=%s" %instcode
+        p = "symbol=%s" %instcodes
         df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)    
         
         d = {}
         for i in range(len(df)):
-            k = df.loc[i]['symbol']
-            v = df.loc[i]
+            k = df.iloc[i]['symbol']
+            v = df.iloc[i]
             d[k] = v
         return d
 
-    def queryInstrument(self, instcodes):
+    #----------------------------------------------------------------------
+    def queryQuotes(self, instcodes):
 
-        p = "symbol=%s" %instcodes
-        df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)    
-        instrument = df.ix[0]
+        item_count = 50
+        
+        codelist = instcodes.split(",")
         
         d = {}
-        for k, v in instrument.items():
-            d[k.lower()] = v
+        
+        symbol = ''
+        for idx in range(len(codelist)):
+            symbol += codelist[idx]
+            symbol += ','
+            
+            if (idx == item_count):
+                df, msg = self.api.quote(fields=self.fields, symbol=symbol)    
+                
+                for i in range(len(df)):
+                    k = df.iloc[i]['symbol']
+                    v = df.iloc[i]
+                    d[k] = v
+
+                idx = 0
+                
+        if idx>0:
+            df, msg = self.api.quote(fields=self.fields, symbol=symbol)    
+            
+            for i in range(len(df)):
+                k = df.iloc[i]['symbol']
+                v = df.iloc[i]
+                d[k] = v
+            
         return d
 
 

@@ -101,7 +101,7 @@ class QuantOSLoginEngine(QtGui.QWidget):
                 strategyList_sl = []
                 for strategy in strategyList:
                     strategyList_sl.append(str(strategy))
-                #strategyList_sl.sort()
+                strategyList_sl.sort()
                 self.comboStrategy.addItems(strategyList_sl)
                 self.userName.setEnabled(False)
                 self.password.setEnabled(False)
