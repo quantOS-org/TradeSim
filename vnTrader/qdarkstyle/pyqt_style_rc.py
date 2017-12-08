@@ -8,9 +8,7 @@
 
 # PyQt 4/5 compatibility
 try:
-    print("A")
     from PyQt4 import QtCore
-    print("A")
 except ImportError:
     from PyQt5 import QtCore
 

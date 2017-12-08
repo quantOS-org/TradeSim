@@ -5,18 +5,17 @@ import os
 import ctypes
 import platform
 
-from imp import reload
+#from imp import reload
 try:
-    print("a")
     from PyQt4.QtGui import QIcon, QApplication
-    print("a")
-    print("a")
 except ImportError:
     from PyQt5.QtWidgets import QApplication
     from PyQt5.QtGui import QIcon
     
 from vtEngine import MainEngine
-from uiMainWindow import *
+from uiMainWindow import MainWindow
+from uiBasicWidget import BASIC_FONT
+import qdarkstyle
 
 
 #----------------------------------------------------------------------
@@ -47,7 +46,7 @@ def main():
     sheets = [whitesheet, darksheet]
     # 设置Qt的皮肤
     try:
-        f = file("setting/VT_setting.json")
+        f = open("setting/VT_setting.json")
         setting = json.load(f)
         if setting['darkStyle']:
             app.setStyleSheet(darksheet)
