@@ -6,7 +6,15 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore
+# PyQt 4/5 compatibility
+try:
+    print("A")
+    from PyQt4 import QtCore
+    print("A")
+except ImportError:
+    from PyQt5 import QtCore
+
+    
 
 qt_resource_data = b"\
 \x00\x00\x11\x43\

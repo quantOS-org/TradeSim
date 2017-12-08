@@ -55,7 +55,11 @@ def load_stylesheet(pyside=True):
 
     # Load the stylesheet content from resources
     if not pyside:
-        from PyQt4.QtCore import QFile, QTextStream
+        # PyQt 4/5 compatibility
+        try:
+            from PyQt4.QtCore import QFile, QTextStream
+        except ImportError:
+            from PyQt5.QtCore import QFile, QTextStream
     else:
         from PySide.QtCore import QFile, QTextStream
 

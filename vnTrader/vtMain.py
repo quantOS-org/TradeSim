@@ -5,8 +5,16 @@ import os
 import ctypes
 import platform
 
-from imp import reload 
-            
+from imp import reload
+try:
+    print("a")
+    from PyQt4.QtGui import QIcon, QApplication
+    print("a")
+    print("a")
+except ImportError:
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtGui import QIcon
+    
 from vtEngine import MainEngine
 from uiMainWindow import *
 
@@ -15,11 +23,13 @@ from uiMainWindow import *
 def main():
     """主程序入口"""
     # 重载sys模块，设置默认字符串编码方式为utf8
+    '''
     reload(sys)
     try:
         sys.setdefaultencoding('utf8')
     except:
         pass
+    '''
     
     # 设置Windows底部任务栏图标
     if 'Windows' in platform.uname() :
@@ -28,8 +38,8 @@ def main():
     # 初始化Qt应用对象
     icon = os.path.join(os.getcwd(), 'setting', 'vnpy.ico')
     
-    app = QtGui.QApplication(['VnTrader',''])
-    app.setWindowIcon(QtGui.QIcon(icon))
+    app = QApplication(['VnTrader',''])
+    app.setWindowIcon(QIcon(icon))
     app.setFont(BASIC_FONT)
     
     darksheet = qdarkstyle.load_stylesheet(pyside=False)

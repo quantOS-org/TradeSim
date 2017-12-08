@@ -714,6 +714,9 @@ class QuantOSMdApi(object):
         
         self.fields = self.fields.replace(' ', '').lower()
         
+        # DEBUG
+        import sys
+        sys.path.append('/home/bliu/work/myproj/jaqs')
         from jaqs.data import DataApi
         self.DataApi = DataApi
 

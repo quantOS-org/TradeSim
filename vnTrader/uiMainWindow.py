@@ -4,12 +4,18 @@ from builtins import str
 
 import psutil
 #import sys
+# PyQt 4/5 compatibility
+try:
+    from PyQt4.QtGui import QMainWindow, QDialog, QDockWidget, QAction, QHeaderView, QMessageBox
+except ImportError:
+    from PyQt5.QtWidgets import QMainWindow, QDialog, QDockWidget, QAction, QHeaderView, QMessageBox
+
 import qdarkstyle
 
 from uiBasicWidget import *
 
 ########################################################################
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
     """主窗口"""
     signalStatusBar = QtCore.pyqtSignal(type(Event()))
 
@@ -78,16 +84,16 @@ class MainWindow(QtGui.QMainWindow):
     def initMenu(self):
         """初始化菜单"""
         # 创建操作
-        connectQuantOSAction = QtGui.QAction(u'连接和切换策略', self)
+        connectQuantOSAction = QAction(u'连接和切换策略', self)
         connectQuantOSAction.triggered.connect(self.connectQuantOS)          
         
-        exitAction = QtGui.QAction(u'退出', self)
+        exitAction = QAction(u'退出', self)
         exitAction.triggered.connect(self.close)
         
-        aboutAction = QtGui.QAction(u'关于', self)
+        aboutAction = QAction(u'关于', self)
         aboutAction.triggered.connect(self.openAbout)
         
-        colorAction = QtGui.QAction(u'变色', self)
+        colorAction = QAction(u'变色', self)
         colorAction.triggered.connect(self.changeColor)
                 
         # 创建菜单
@@ -108,7 +114,7 @@ class MainWindow(QtGui.QMainWindow):
     #----------------------------------------------------------------------
     def initStatusBar(self):
         """初始化状态栏"""
-        self.statusLabel = QtGui.QLabel()
+        self.statusLabel = QLabel()
         self.statusLabel.setAlignment(QtCore.Qt.AlignLeft)
         
         self.statusBar().addPermanentWidget(self.statusLabel)
@@ -151,11 +157,11 @@ class MainWindow(QtGui.QMainWindow):
     #----------------------------------------------------------------------
     def closeEvent(self, event):
         """关闭事件"""
-        reply = QtGui.QMessageBox.question(self, u'退出',
-                                           u'确认退出?', QtGui.QMessageBox.Yes | 
-                                           QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+        reply = QMessageBox.question(self, u'退出',
+                                           u'确认退出?', QMessageBox.Yes |
+                                           QMessageBox.No, QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes: 
+        if reply == QMessageBox.Yes:
             for widget in list(self.widgetDict.values()):
                 widget.close()
             
@@ -168,7 +174,7 @@ class MainWindow(QtGui.QMainWindow):
     def createDock(self, widgetClass, widgetName, widgetArea):
         """创建停靠组件"""
         widget = widgetClass(self.mainEngine, self.eventEngine)
-        dock = QtGui.QDockWidget(widgetName)
+        dock = QDockWidget(widgetName)
         dock.setWidget(widget)
         dock.setObjectName(widgetName)
         dock.setFeatures(dock.DockWidgetFloatable|dock.DockWidgetMovable)
@@ -180,7 +186,7 @@ class MainWindow(QtGui.QMainWindow):
         self.sheets = [self.sheets[1], self.sheets[0]]
 
 ########################################################################
-class AboutWidget(QtGui.QDialog):
+class AboutWidget(QDialog):
     """显示关于信息"""
 
     #----------------------------------------------------------------------
@@ -199,11 +205,11 @@ class AboutWidget(QtGui.QDialog):
             quantos trade client
             """
 
-        label = QtGui.QLabel()
+        label = QLabel()
         label.setText(text)
         label.setMinimumWidth(500)
 
-        vbox = QtGui.QVBoxLayout()
+        vbox = QVBoxLayout()
         vbox.addWidget(label)
 
         self.setLayout(vbox)
