@@ -143,10 +143,6 @@ class PositionCell(QTableWidgetItem):
             if num == 0:
                 self.setText('')
             else:
-                if num < 0:
-                    self.setForeground(QtGui.QColor('red'))
-                else:
-                    self.setForeground(QtGui.QColor('green'))
                 self.setData(QtCore.Qt.DisplayRole, num)
         except ValueError:
             self.setText(text)
