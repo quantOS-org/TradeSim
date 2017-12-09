@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
     
     def updateTitle(self, event):
         (user, stratid) = event.dict_['data']
-        self.setWindowTitle('VnTrader: ' + str(user) + "/" + str(stratid))
+        #self.setWindowTitle('VnTrader: ' + str(user) + "/" + str(stratid))
         self.sid = stratid
     
     # ----------------------------------------------------------------------
