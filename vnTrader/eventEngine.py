@@ -189,7 +189,7 @@ class EventEngine2(object):
         # 计时器，用于触发计时器事件
         self.__timer = Thread(target=self.__runTimer)
         self.__timerActive = False  # 计时器工作状态
-        self.__timerSleep = 2.5  # 计时器触发间隔（默认1秒）
+        self.__timerSleep = 1  # 计时器触发间隔（默认1秒）
         
         # 这里的__handlers是一个字典，用来保存对应的事件调用关系
         # 其中每个键对应的值是一个列表，列表中保存了对该事件进行监听的函数功能
