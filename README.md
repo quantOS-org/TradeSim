@@ -16,7 +16,7 @@ TradeSim中的交易系统模块支持多账户管理、多通道交易、实时
 
 ## 客户端使用
 
-TradeSim提供Web客户端、专用Python客户端等访问方式。
+TradeSim提供Web客户端、专用Python客户端等访问方式。支持Python 2.7/3.6，支持PyQt 4/5.
 
 1. Web客户端：请登录[仿真交易](http://www.quantos.org/tradesim/trade.html)后使用。使用帮助参见[https://github.com/quantOS-org/TradeSim/tree/master/doc/webClient.md](https://github.com/quantOS-org/TradeSim/tree/master/doc/webClient.md)
 2. 专用Python客户端：提供vnTrader客户端，请从[这里](https://github.com/quantOS-org/TradeSim/tree/master/vnTrader)下载。使用帮助参见[https://github.com/quantOS-org/TradeSim/tree/master/doc/vnTrader.md](https://github.com/quantOS-org/TradeSim/tree/master/doc/vnTrader.md)
