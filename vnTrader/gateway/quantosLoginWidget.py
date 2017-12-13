@@ -2,9 +2,14 @@
 
 from builtins import str
 
-from uiBasicWidget import QtGui
+# PyQt 4/5 compatibility
+try:
+    from PyQt4.QtGui import QFrame, QWidget, QLineEdit, QTextEdit, QComboBox, QGridLayout,QLabel,QMessageBox,QPushButton,QVBoxLayout,QHBoxLayout
+except ImportError:
+    from PyQt5.QtWidgets import QFrame, QWidget, QLineEdit, QTextEdit, QComboBox, QGridLayout,QLabel,QMessageBox,QPushButton,QHBoxLayout,QVBoxLayout
 
-class LoginLine(QtGui.QFrame):
+
+class LoginLine(QFrame):
     """水平分割线"""
 
     #----------------------------------------------------------------------
@@ -15,7 +20,7 @@ class LoginLine(QtGui.QFrame):
         self.setFrameShadow(self.Sunken)
         
 ########################################################################
-class QuantOSLoginEngine(QtGui.QWidget):
+class QuantOSLoginEngine(QWidget):
     """风控引擎的管理组件"""
 
     #----------------------------------------------------------------------
@@ -35,29 +40,29 @@ class QuantOSLoginEngine(QtGui.QWidget):
         self.setWindowTitle(u'登录')
         
         # 设置界面
-        self.userName = QtGui.QLineEdit()
-        self.password = QtGui.QTextEdit()
-        self.comboStrategy = QtGui.QComboBox()
+        self.userName = QLineEdit()
+        self.password = QTextEdit()
+        self.comboStrategy = QComboBox()
         
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
         grid.addWidget(LoginLine(), 1, 0, 1, 2)
-        grid.addWidget(QtGui.QLabel(u'用户名'), 2, 0)
+        grid.addWidget(QLabel(u'用户名'), 2, 0)
         grid.addWidget(self.userName, 2, 1)
-        grid.addWidget(QtGui.QLabel(u'令牌'), 3, 0)
+        grid.addWidget(QLabel(u'令牌'), 3, 0)
         grid.addWidget(self.password, 3, 1)
         grid.addWidget(LoginLine(), 4, 0, 1, 2)
-        grid.addWidget(QtGui.QLabel(u'策略'), 5, 0)
+        grid.addWidget(QLabel(u'策略'), 5, 0)
         grid.addWidget(self.comboStrategy, 5, 1)
         grid.addWidget(LoginLine(), 6, 0, 1, 2)
      
-        self.buttonCancel = QtGui.QPushButton(u'取消')
-        self.buttonConfirm = QtGui.QPushButton(u'确认')
-        hbox = QtGui.QHBoxLayout()
+        self.buttonCancel = QPushButton(u'取消')
+        self.buttonConfirm = QPushButton(u'确认')
+        hbox = QHBoxLayout()
         hbox.addWidget(self.buttonConfirm)
         hbox.addWidget(self.buttonCancel)
         self.buttonConfirm.setDefault(True)
 
-        vbox = QtGui.QVBoxLayout()
+        vbox = QVBoxLayout()
         vbox.addLayout(grid)
         vbox.addLayout(hbox)
         self.setLayout(vbox)
@@ -82,7 +87,7 @@ class QuantOSLoginEngine(QtGui.QWidget):
             username = str(self.userName.text()).strip()
             password = str(self.password.toPlainText()).strip()
             if len(username) <= 0 or len(password) <= 0:
-                QtGui.QMessageBox.warning(self, u'登录', u'输入用户名和密码')
+                QMessageBox.warning(self, u'登录', u'输入用户名和密码')
             else:
                 self.close()
                 self.gateway.login(username, password, selectedStrat)
@@ -93,7 +98,7 @@ class QuantOSLoginEngine(QtGui.QWidget):
         userName = str(self.userName.text()).strip()
         password = str(self.password.toPlainText()).strip()
         if len(userName) <= 0 or len(password) <= 0:
-            QtGui.QMessageBox.warning(self, u'获取策略', u'输入用户名和密码')
+            QMessageBox.warning(self, u'获取策略', u'输入用户名和密码')
         else:
             strategyList = self.gateway.getStrategyList(userName, password)
             if strategyList is not None and len(strategyList) > 0:
@@ -107,7 +112,7 @@ class QuantOSLoginEngine(QtGui.QWidget):
                 self.password.setEnabled(False)
 
             else:
-                QtGui.QMessageBox.warning(self, u'获取策略', u'无法获取相关策略')
+                QMessageBox.warning(self, u'获取策略', u'无法获取相关策略')
                 self.comboStrategy.clear()
             
             self.comboStrategy.setFocus()

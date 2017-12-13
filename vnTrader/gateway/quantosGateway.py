@@ -714,6 +714,9 @@ class QuantOSMdApi(object):
         
         self.fields = self.fields.replace(' ', '').lower()
         
+        # DEBUG
+        import sys
+        sys.path.append('/home/bliu/work/myproj/jaqs')
         from jaqs.data import DataApi
         self.DataApi = DataApi
 
@@ -791,6 +794,8 @@ class QuantOSMdApi(object):
             
             if info is not None:
                 self.writeLog(u'行情连接成功')
+            else:
+                self.writeLog(u'行情连接失败，错误信息：%s' % msg)
         else:
             self.writeLog(u'行情已经连接')
     
@@ -802,7 +807,7 @@ class QuantOSMdApi(object):
         """订阅"""
         subscribed, msg = self.api.subscribe(symbols, fields=self.fields, func=self.onMarketData)
         if subscribed is None:
-            self.writeLog(u'行情订阅失败，错误信息：%s' % str(msg))
+            self.writeLog(u'行情订阅失败，错误信息：%s' % msg)
     
     #----------------------------------------------------------------------
     def writeLog(self, logContent):
@@ -816,7 +821,7 @@ class QuantOSMdApi(object):
     def queryInstruments(self, instcodes):
 
         p = "symbol=%s" %instcodes
-        df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)    
+        df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)
         
         d = {}
         for i in range(len(df)):

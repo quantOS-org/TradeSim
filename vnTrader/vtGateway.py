@@ -6,7 +6,6 @@ from builtins import object
 import time
 
 from eventEngine import *
-
 from vtConstant import *
 
 
