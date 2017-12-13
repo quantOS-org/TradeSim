@@ -47,227 +47,146 @@ class BasicCell(QTableWidgetItem):
     """基础的单元格"""
     
     # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
+    def __init__(self, text=None, mainEngine=None, foreground=None, background=None):
         """Constructor"""
         super(BasicCell, self).__init__()
+        if foreground is not None:
+            self.setForeground(foreground)
+        if background is not None:
+            self.setBackground(background)
+            
         self.data = None
         if text:
             self.setContent(text)
     
+    def _conditional_style_before(self, text):
+        pass
+
+    def _conditional_style_after(self, text):
+        pass
+    
+    def _after_set_text(self):
+        pass
+    
+    def _get_text(self, text):
+        return text
+    
     # ----------------------------------------------------------------------
     def setContent(self, text):
         """设置内容"""
-        #text = str(text)
-        if text == '0' or text == '0.0':
-            self.setText('')
-        else:
-            self.setText(text)
+        
+        if text is None:
+            self.setText("")
+            return
+        
+        real_text = self._get_text(text)
+        
+        self._conditional_style_before(text)
+        self.setText(real_text)
+        self._conditional_style_after(text)
+        
+        self._after_set_text()
 
 
-class ErrorCell(QTableWidgetItem):
+class ErrorCell(BasicCell):
     """基础的单元格"""
     
-    # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(ErrorCell, self).__init__()
-        self.data = None
-        if text:
-            self.setContent(text)
+    def _conditional_style_after(self, text):
+        if text.find(u'失败') >= 0 or text.find(u'错误') >= 0:
+            self.setForeground(QtGui.QColor('red'))
+            self.setToolTip(text)
+
+
+########################################################################
+class NumCell(BasicCell):
+    """用来显示数字的单元格"""
     
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
+    def _get_text(self, text):
         if text == '0' or text == '0.0':
-            self.setText('')
+            res = ''
         else:
-            self.setText(text)
-            if text.find(u'失败') >= 0 or text.find(u'错误') >= 0:
-                self.setTextColor(QtGui.QColor('red'))
-                self.setToolTip(text)
+            res = text
+        return res
 
 
 ########################################################################
-class NumCellColored(QTableWidgetItem):
+class NumCellColored(NumCell):
     """用来显示数字的单元格"""
     
-    # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(NumCellColored, self).__init__()
-        self.data = None
-        
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
-        # 考虑到NumCell主要用来显示OrderID和TradeID之类的整数字段，
-        # 这里的数据转化方式使用int类型。但是由于部分交易接口的委托
-        # 号和成交号可能不是纯数字的形式，因此补充了一个try...except
+    def _conditional_style_after(self, text):
         try:
-            num = int(float(text))
-            if num == 0:
-                self.setText('')
-            else:
-                if num < 0:
-                    self.setForeground(QtGui.QColor('green'))
-                else:
-                    self.setForeground(QtGui.QColor('red'))
-                self.setData(QtCore.Qt.DisplayRole, num)
-        except ValueError:
-            self.setText(text)
+            num = float(text)
+        except Exception as e:
+            print(type(text), text)
+            raise(e)
+        if num < 0:
+            self.setForeground(QtGui.QColor('green'))
+        else:
+            self.setForeground(QtGui.QColor('red'))
 
 
-class PositionCell(QTableWidgetItem):
+class PositionCell(NumCell):
     """用来显示数字的单元格"""
+    pass
     
-    # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(PositionCell, self).__init__()
-        self.data = None
-        
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
-        # 考虑到NumCell主要用来显示OrderID和TradeID之类的整数字段，
-        # 这里的数据转化方式使用int类型。但是由于部分交易接口的委托
-        # 号和成交号可能不是纯数字的形式，因此补充了一个try...except
-        try:
-            num = int(float(text))
-            if num == 0:
-                self.setText('')
-            else:
-                self.setData(QtCore.Qt.DisplayRole, num)
-        except ValueError:
-            self.setText(text)
-
 
 ########################################################################
-class NumCell(QTableWidgetItem):
-    """用来显示数字的单元格"""
-    
-    # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(NumCell, self).__init__()
-        self.data = None
-        
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
-        # 考虑到NumCell主要用来显示OrderID和TradeID之类的整数字段，
-        # 这里的数据转化方式使用int类型。但是由于部分交易接口的委托
-        # 号和成交号可能不是纯数字的形式，因此补充了一个try...except
-        try:
-            num = int(float(text))
-            if num == 0:
-                self.setText('')
-            else:
-                self.setData(QtCore.Qt.DisplayRole, num)
-        except ValueError:
-            self.setText(text)
-
-
-########################################################################
-class DirectionCell(QTableWidgetItem):
+class DirectionCell(BasicCell):
     """用来显示买卖方向的单元格"""
     
     # ----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(DirectionCell, self).__init__()
-        self.data = None
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
+    def _conditional_style_after(self, text):
         """设置内容"""
         if text == DIRECTION_LONG or text == DIRECTION_NET:
             self.setForeground(QtGui.QColor('red'))
         elif text == DIRECTION_SHORT:
             self.setForeground(QtGui.QColor('green'))
-        self.setText(text)
 
 
 ########################################################################
-class NameCell(QTableWidgetItem):
+class NameCell(BasicCell):
     """用来显示合约中文的单元格"""
     
     # ----------------------------------------------------------------------
     def __init__(self, text=None, mainEngine=None):
         """Constructor"""
-        super(NameCell, self).__init__()
-        
         self.mainEngine = mainEngine
-        self.data = None
         
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
+        super(NameCell, self).__init__(text=text, mainEngine=mainEngine)
+        
+        
+    def _get_text(self, text):
         if self.mainEngine:
             # 首先尝试正常获取合约对象
             contract = self.mainEngine.getContract(text)
-            
+        
             # 如果能读取合约信息
             if contract:
-                self.setText(contract.name)
-
+                return contract.name
+        
 
 ########################################################################
-class BidCell(QTableWidgetItem):
+class BidCell(BasicCell):
     """买价单元格"""
     
     # ----------------------------------------------------------------------
     def __init__(self, text=None, mainEngine=None):
         """Constructor"""
-        super(BidCell, self).__init__()
-        self.data = None
-        
-        self.setForeground(QtGui.QColor('black'))
-        self.setBackground(QtGui.QColor(255, 174, 201))
-        
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
-        self.setText(text)
+        super(BidCell, self).__init__(text=text, mainEngine=mainEngine,
+                                      background=QtGui.QColor(255, 174, 201),
+                                      foreground=QtGui.QColor('black'))
 
 
 ########################################################################
-class AskCell(QTableWidgetItem):
+class AskCell(BasicCell):
     """买价单元格"""
     
     # ----------------------------------------------------------------------
     def __init__(self, text=None, mainEngine=None):
         """Constructor"""
-        super(AskCell, self).__init__()
-        self.data = None
-        
-        self.setForeground(QtGui.QColor('black'))
-        self.setBackground(QtGui.QColor(160, 255, 160))
-        
-        if text:
-            self.setContent(text)
-    
-    # ----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
-        self.setText(text)
+        super(AskCell, self).__init__(text=text, mainEngine=mainEngine,
+                                      background=QtGui.QColor(160, 255, 160),
+                                      foreground=QtGui.QColor('black'))
 
 
 ########################################################################
@@ -412,10 +331,16 @@ class BasicMonitor(QTableWidget):
                 self.insertRow(0)
                 d = {}
                 for n, header in enumerate(self.headerList):
-                    # content = safeUnicode(data.__getattribute__(header))
-                    content = safeUnicode(getattr(data, header, None))
+                    content = safeUnicode(data.__getattribute__(header))
+                    # content = safeUnicode(getattr(data, header, None))
                     cellType = self.headerDict[header]['cellType']
-                    cell = cellType(content, self.mainEngine)
+                    try:
+                        cell = cellType(content, self.mainEngine)
+                    except Exception as e:
+                        print(cellType)
+                        print(data)
+                        print(content)
+                        raise(e)
                     
                     if self.font:
                         cell.setFont(self.font)  # 如果设置了特殊字体，则进行单元格设置
@@ -636,8 +561,8 @@ class TradeMonitor(BasicMonitor):
         super(TradeMonitor, self).__init__(mainEngine, eventEngine, parent)
         
         d = OrderedDict()
-        d['tradeID'] = {'chinese': u'成交编号', 'cellType': NumCell}
-        d['orderID'] = {'chinese': u'委托编号', 'cellType': NumCell}
+        d['tradeID'] = {'chinese': u'成交编号', 'cellType': BasicCell}
+        d['orderID'] = {'chinese': u'委托编号', 'cellType': BasicCell}
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
         d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
         d['direction'] = {'chinese': u'方向', 'cellType': DirectionCell}
@@ -670,7 +595,7 @@ class OrderMonitor(BasicMonitor):
         self.mainEngine = mainEngine
         
         d = OrderedDict()
-        d['orderID'] = {'chinese': u'委托编号', 'cellType': NumCell}
+        d['orderID'] = {'chinese': u'委托编号', 'cellType': BasicCell}
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
         d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
         d['priceType'] = {'chinese': u'算法', 'cellType': BasicCell}
@@ -682,7 +607,7 @@ class OrderMonitor(BasicMonitor):
         d['tradedVolume'] = {'chinese': u'成交数量', 'cellType': NumCell}
         d['status'] = {'chinese': u'状态', 'cellType': BasicCell}
         d['orderTime'] = {'chinese': u'委托时间', 'cellType': BasicCell}
-        d['taskID'] = {'chinese': u'任务编号', 'cellType': NumCell}
+        d['taskID'] = {'chinese': u'任务编号', 'cellType': BasicCell}
         # d['cancelTime'] = {'chinese':u'撤销时间', 'cellType':BasicCell}
         # d['frontID'] = {'chinese':u'前置编号', 'cellType':BasicCell}
         # d['sessionID'] = {'chinese':u'会话编号', 'cellType':BasicCell}
@@ -752,7 +677,7 @@ class PositionMonitor(BasicMonitor):
         d['direction'] = {'chinese': u'方向', 'cellType': DirectionCell}
         d['initPosition'] = {'chinese': u'初持仓', 'cellType': PositionCell}
         d['position'] = {'chinese': u'总持仓', 'cellType': PositionCell}
-        d['price'] = {'chinese': u'成本价', 'cellType': BasicCell}
+        d['price'] = {'chinese': u'成本价', 'cellType': NumCell}
         d['ydPosition'] = {'chinese': u'昨持仓', 'cellType': PositionCell}
         d['tdPosition'] = {'chinese': u'今持仓', 'cellType': PositionCell}
         d['frozen'] = {'chinese': u'冻结量', 'cellType': NumCell}
@@ -760,9 +685,9 @@ class PositionMonitor(BasicMonitor):
         d['want'] = {'chinese': u'开仓在途', 'cellType': NumCell}
         d['trading'] = {'chinese': u'交易赢亏', 'cellType': NumCellColored}
         d['holding'] = {'chinese': u'持仓赢亏', 'cellType': NumCellColored}
-        d['commission'] = {'chinese': u'手续费', 'cellType': BasicCell}
+        d['commission'] = {'chinese': u'手续费', 'cellType': NumCell}
         
-        d['last'] = {'chinese': u'市场价', 'cellType': BasicCell}
+        d['last'] = {'chinese': u'市场价', 'cellType': NumCell}
         d['mktval'] = {'chinese': u'市值', 'cellType': NumCell}
         
         self.setHeaderDict(d)
@@ -795,7 +720,7 @@ class AccountMonitor(BasicMonitor):
         d['margin'] = {'chinese': u'保证金', 'cellType': NumCell}
         d['holding_pnl'] = {'chinese': u'持仓盈亏', 'cellType': NumCellColored}
         d['trading_pnl'] = {'chinese': u'交易盈亏', 'cellType': NumCellColored}
-        d['commission'] = {'chinese': u'手续费', 'cellType': BasicCell}
+        d['commission'] = {'chinese': u'手续费', 'cellType': NumCell}
         d['float_pnl'] = {'chinese': u'浮动盈亏', 'cellType': NumCellColored}
         d['close_pnl'] = {'chinese': u'平仓盈亏', 'cellType': NumCellColored}
         d['deposit_balance'] = {'chinese': u'差额', 'cellType': NumCell}
