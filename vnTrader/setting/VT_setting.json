@@ -5,7 +5,7 @@
 	"mdAddress" : "tcp://data.tushare.org:8910",   
     "tdAddress" : "tcp://gw.quantos.org:8901",
 
-    "username" : "17621969269",
+    "username" : "YourTelephoneNumber",
     "token"    : "YourToken",
 
 	"darkStyle": true
