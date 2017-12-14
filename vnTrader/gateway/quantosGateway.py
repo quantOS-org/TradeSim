@@ -4,14 +4,23 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import range
 from builtins import object
-import sys
-import os
+
+import time
 import json
 import traceback
 
 from vtGateway import *
+from jaqs.trade.tradeapi import TradeApi
+from jaqs.data import DataApi
 from .quantosLoginWidget import QuantOSLoginEngine
 
+
+def check_return_error(res, err_msg):
+    if res is None:
+        return False
+    else:
+        return True
+        
 # functions for generating algo parameters
 
 #----------------------------------------------------------------------
@@ -236,7 +245,6 @@ class QuantOSTdApi(object):
         self.current_user = None
         self.current_strats = None
         
-        from jaqs.trade.tradeapi import TradeApi
         self.TradeApi = TradeApi
         
         self.setting = setting
@@ -256,9 +264,9 @@ class QuantOSTdApi(object):
         """"""
         pf, msg = self.api.query_universe()
         
-        if pf is None:
-            self.writeLog(u'查询合约失败，错误信息：%s' %msg)  
-            return False            
+        if not check_return_error(pf, msg):
+            self.writeLog(u'查询合约失败，错误信息：{}'.format(msg))
+            return False
         
         symbols = ''
         for instcode in pf['security']:
@@ -294,10 +302,10 @@ class QuantOSTdApi(object):
     def subscribePositionSymbols(self):
         """"""
         pf, msg = self.api.query_position()
-        
-        if pf is None:
-            self.writeLog(u'查询持仓失败，错误信息：%s' %msg)  
-            return False            
+
+        if not check_return_error(pf, msg):
+            self.writeLog(u'查询持仓失败，错误信息：{}'.format(msg))
+            return False
         
         symbols = ''
         for instcode in pf['security']:
@@ -453,16 +461,17 @@ class QuantOSTdApi(object):
 
             # 登录
             info, msg = self.api.login(username, token)
-            
-            if info is None:
-                self.writeLog(u'登录失败，错误信息：%s' % msg)
-                self.api = None
-                return None
-            else:
+
+            if check_return_error(info, msg):
                 self.writeLog(u'登录成功')
                 self.current_strats = info['strategies']
                 self.current_user = info['username']
                 return info['strategies']
+            # if info is None:
+            else:
+                self.writeLog(u'登录失败，错误信息：%s' % msg)
+                self.api = None
+                return None
         else:
             self.writeLog(u'已经登录')
             return self.current_strats
@@ -501,20 +510,20 @@ class QuantOSTdApi(object):
                 result, msg = self.api.use_strategy(int(strategyid))
                 self.current_stratid = strategyid
     
-                if result is 0:
-                    self.writeLog(u'选定策略账户失败，错误信息：%s' %msg)
-                else:
+                if check_return_error(result, msg):
                     self.writeLog(u'选定策略账户%s成功' %result)
                     # sleep for 1 second and then query data
-                    sleep(1)
+                    time.sleep(1)
                     self.changeTitle()
                     self.clearAll()
                     self.loadContracts()
-                    self.subscribePositionSymbols()    
+                    self.subscribePositionSymbols()
                     self.qryOrder()
                     self.qryTrade()
+                else:
+                    self.writeLog(u'选定策略账户失败，错误信息：%s' %msg)
             else:
-                    sleep(1)
+                    time.sleep(1)
                     self.clearAll()
                     self.loadContracts() 
                     self.subscribePositionSymbols()    
@@ -548,13 +557,13 @@ class QuantOSTdApi(object):
             else:
                 taskid, msg = self.api.place_order(security, action, orderReq.price, int(orderReq.volume))
             
-            if taskid is 0:
+            if not check_return_error(taskid, msg):
                 self.writeLog(u'委托失败，错误信息：%s' %msg)
         else:
             inc_size = int(orderReq.volume) if orderReq.direction == DIRECTION_LONG else int(orderReq.volume) * -1
                 
-            taskid, msg = self.api.basket_order([{"security":security, "ref_price":orderReq.price, "inc_size":inc_size}], algo, paramsFunction(security, urgency))
-            if taskid is 0:
+            taskid, msg = self.api.batch_order([{"security": security, "price":orderReq.price, "size":inc_size}], algo, paramsFunction(security, urgency))
+            if not check_return_error(taskid, msg):
                 self.writeLog(u'篮子委托失败，错误信息：%s' %msg)
     #----------------------------------------------------------------------
     def sendBasketOrder(self, req):
@@ -564,7 +573,7 @@ class QuantOSTdApi(object):
         taskid, msg = self.api.basket_order(req.positions, req.algo, req.params)
         
         # return result
-        if taskid is 0:
+        if not check_return_error(taskid, msg):
             self.writeLog(u'篮子委托失败，错误信息：%s' %msg)
             return None
         else:     
@@ -577,17 +586,17 @@ class QuantOSTdApi(object):
             return
 
         result, msg = self.api.cancel_order(cancelOrderReq.orderID)
-        
-        if result is 0:
-            self.writeLog(u'撤单失败，错误信息：%s' %msg)             
+
+        if not check_return_error(taskid, msg):
+            self.writeLog(u'撤单失败，错误信息：%s' %msg)
             
     #----------------------------------------------------------------------
     def qryPosition(self):
         """查询持仓"""
         df, msg = self.api.query_position()
-        
-        if df is None:
-            self.writeLog(u'查询持仓失败，错误信息：%s' %msg)  
+
+        if not check_return_error(df, msg):
+            self.writeLog(u'查询持仓失败，错误信息：%s' %msg)
             return False
         
         for i in range(len(df)):
@@ -632,9 +641,9 @@ class QuantOSTdApi(object):
     def qryAccount(self):
         
         df, msg = self.api.query_account()
-        
-        if df is None:
-            self.writeLog(u'查询资金失败，错误信息：%s' %msg)  
+
+        if not check_return_error(df, msg):
+            self.writeLog(u'查询资金失败，错误信息：%s' %msg)
             return False
         
         for i in range(len(df)):
@@ -662,8 +671,8 @@ class QuantOSTdApi(object):
     def qryOrder(self):
         """查询委托"""
         df, msg = self.api.query_order()
-        
-        if df is None:
+
+        if not check_return_error(df, msg):
             self.writeLog(u'查询委托失败，错误信息：%s' %msg)
             return False
         
@@ -678,8 +687,8 @@ class QuantOSTdApi(object):
     def qryTrade(self):
         """查询成交"""
         df, msg = self.api.query_trade()
-        
-        if df is None:
+
+        if not check_return_error(df, msg):
             self.writeLog(u'查询成交失败，错误信息：%s' %msg)
             return False
         
@@ -714,10 +723,6 @@ class QuantOSMdApi(object):
         
         self.fields = self.fields.replace(' ', '').lower()
         
-        # DEBUG
-        import sys
-        sys.path.append('/home/bliu/work/myproj/jaqs')
-        from jaqs.data import DataApi
         self.DataApi = DataApi
 
         self.setting = setting
@@ -791,8 +796,8 @@ class QuantOSMdApi(object):
             
             #登录
             info, msg = self.api.login(username, token)
-            
-            if info is not None:
+
+            if check_return_error(info, msg):
                 self.writeLog(u'行情连接成功')
             else:
                 self.writeLog(u'行情连接失败，错误信息：%s' % msg)
@@ -806,7 +811,7 @@ class QuantOSMdApi(object):
     def subscribe(self, symbols):
         """订阅"""
         subscribed, msg = self.api.subscribe(symbols, fields=self.fields, func=self.onMarketData)
-        if subscribed is None:
+        if not check_return_error(subscribed, msg):
             self.writeLog(u'行情订阅失败，错误信息：%s' % msg)
     
     #----------------------------------------------------------------------
