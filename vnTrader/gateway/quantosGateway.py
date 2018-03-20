@@ -78,6 +78,15 @@ exchangeMap[EXCHANGE_DCE] = 'DCE'
 exchangeMap[EXCHANGE_SSE] = 'SH'
 exchangeMap[EXCHANGE_SZSE] = 'SZ'
 exchangeMap[EXCHANGE_SGE] = 'SGE'
+exchangeMap[EXCHANGE_CSI] = 'CSI'
+exchangeMap[EXCHANGE_HKS] = 'HKS'
+exchangeMap[EXCHANGE_HKH] = 'HKH'
+exchangeMap[EXCHANGE_JZ] = 'JZ'
+exchangeMap[EXCHANGE_SPOT] = 'SPOT'
+exchangeMap[EXCHANGE_IB] = 'IB'
+exchangeMap[EXCHANGE_FX] = 'FX'
+exchangeMap[EXCHANGE_INE] = 'INE'
+
 exchangeMapReverse = {v:k for k,v in list(exchangeMap.items())}
 
 # 持仓类型映射
@@ -196,7 +205,7 @@ class QuantOSGateway(VtGateway):
             self.qryCount = 0           # 查询触发倒计时
             self.qryTrigger = 2         # 查询触发点
             self.qryNextFunction = 0    # 上次运行的查询函数索引
-            
+
             self.startQuery()
     
     #----------------------------------------------------------------------
@@ -270,9 +279,10 @@ class QuantOSTdApi(object):
         
         symbols = ''
         for instcode in pf['security']:
-            symbols += str(instcode)
-            symbols += ","
-            
+            if len(instcode) > 0:		
+                symbols += str(instcode)
+                symbols += ","
+        
         instruments = self.gateway.mdApi.queryInstruments(symbols)
         
         for k, d in instruments.items():
@@ -311,8 +321,8 @@ class QuantOSTdApi(object):
         for instcode in pf['security']:
             symbols += str(instcode)
             symbols += ","
+
         quotes = self.gateway.mdApi.queryQuotes(symbols)
-        
         for k, d in quotes.items():
             tick = VtTickData()
             tick.gatewayName = self.gatewayName
@@ -594,7 +604,7 @@ class QuantOSTdApi(object):
     def qryPosition(self):
         """查询持仓"""
         df, msg = self.api.query_position()
-
+		
         if not check_return_error(df, msg):
             self.writeLog(u'查询持仓失败，错误信息：%s' %msg)
             return False
@@ -641,7 +651,7 @@ class QuantOSTdApi(object):
     def qryAccount(self):
         
         df, msg = self.api.query_account()
-
+		
         if not check_return_error(df, msg):
             self.writeLog(u'查询资金失败，错误信息：%s' %msg)
             return False
@@ -796,7 +806,6 @@ class QuantOSMdApi(object):
             
             #登录
             info, msg = self.api.login(username, token)
-
             if check_return_error(info, msg):
                 self.writeLog(u'行情连接成功')
             else:
@@ -829,6 +838,9 @@ class QuantOSMdApi(object):
         df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)
         
         d = {}
+        if df is None:
+		    return {}
+
         for i in range(len(df)):
             k = df.iloc[i]['symbol']
             v = df.iloc[i]
