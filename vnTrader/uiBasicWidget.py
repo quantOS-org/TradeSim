@@ -1336,7 +1336,7 @@ class ContractMonitor(BasicMonitor):
         # 设置数据键
         self.setDataKey('vtSymbol')
         
-        self.setSorting(True)
+        self.setSorting(False)
         
         # 设置监控事件类型
         self.setEventType(EVENT_CONTRACT, EVENT_CONTRACT_CLEAR)

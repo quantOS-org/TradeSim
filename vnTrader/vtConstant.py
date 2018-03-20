@@ -75,6 +75,14 @@ EXCHANGE_CFFEX = 'CFE'      # 中金所
 EXCHANGE_SHFE = 'SHF'       # 上期所
 EXCHANGE_CZCE = 'CZC'       # 郑商所
 EXCHANGE_DCE = 'DCE'        # 大商所
+EXCHANGE_CSI = 'CSI'        # 中证指数
+EXCHANGE_HKH = 'HKH'        # 沪港通
+EXCHANGE_HKS = 'HKS'        # 深港通
+EXCHANGE_JZ  = 'JZ'         # 均直
+EXCHANGE_SPOT  = 'SPOT'     # 现货
+EXCHANGE_IB  = 'IB'         # 银行间市场
+EXCHANGE_FX  = 'FX'         # 外汇
+EXCHANGE_INE  = 'INE'       # 能源
 
 EXCHANGE_SGE = 'SGE'       # 上金所
 EXCHANGE_UNKNOWN = 'UNKNOWN'# 未知交易所
