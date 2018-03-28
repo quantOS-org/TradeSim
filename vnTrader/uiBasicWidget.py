@@ -759,6 +759,16 @@ class TradingWidget(QFrame):
                     EXCHANGE_SZSE,
                     EXCHANGE_SGE,
                     EXCHANGE_HKEX,
+					
+					EXCHANGE_CSI, 
+					EXCHANGE_HKH, 
+					EXCHANGE_HKS, 
+					EXCHANGE_JZ,  
+					EXCHANGE_SPOT,
+					EXCHANGE_IB,  
+					EXCHANGE_FX,  
+					EXCHANGE_INE, 
+					
                     EXCHANGE_SMART,
                     EXCHANGE_ICE,
                     EXCHANGE_CME,
