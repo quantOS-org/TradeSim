@@ -759,16 +759,16 @@ class TradingWidget(QFrame):
                     EXCHANGE_SZSE,
                     EXCHANGE_SGE,
                     EXCHANGE_HKEX,
-					
-					EXCHANGE_CSI, 
-					EXCHANGE_HKH, 
-					EXCHANGE_HKS, 
-					EXCHANGE_JZ,  
-					EXCHANGE_SPOT,
-					EXCHANGE_IB,  
-					EXCHANGE_FX,  
-					EXCHANGE_INE, 
-					
+                    
+                    EXCHANGE_CSI, 
+                    EXCHANGE_HKH, 
+                    EXCHANGE_HKS, 
+                    EXCHANGE_JZ,  
+                    EXCHANGE_SPOT,
+                    EXCHANGE_IB,  
+                    EXCHANGE_FX,  
+                    EXCHANGE_INE, 
+                    
                     EXCHANGE_SMART,
                     EXCHANGE_ICE,
                     EXCHANGE_CME,
@@ -1155,18 +1155,19 @@ class TradingWidget(QFrame):
         self.labelLastPrice.setText('')
         self.labelReturn.setText('')
         
-        # 重新注册事件监听
-        if self.signalemit != None:
-            self.eventEngine.unregister(EVENT_TICK + self.symbol, self.signalemit)
-        
-        self.signalemit = self.signal.emit
-        self.eventEngine.register(EVENT_TICK + vtSymbol, self.signalemit)
-        
-        # 订阅合约
-        self.mainEngine.subscribe(contract.vtSymbol, gatewayName)
-        
-        # 更新组件当前交易的合约
-        self.symbol = vtSymbol
+        if contract:
+            # 重新注册事件监听
+            if self.signalemit != None:
+                self.eventEngine.unregister(EVENT_TICK + self.symbol, self.signalemit)
+            
+            self.signalemit = self.signal.emit
+            self.eventEngine.register(EVENT_TICK + vtSymbol, self.signalemit)
+            
+            # 订阅合约
+            self.mainEngine.subscribe(contract.vtSymbol, gatewayName)
+            
+            # 更新组件当前交易的合约
+            self.symbol = vtSymbol
     
     # ----------------------------------------------------------------------
     def updateTick(self, event):
@@ -1240,7 +1241,11 @@ class TradingWidget(QFrame):
             exchange = contract.exchange  # 保证有交易所代码
         
         req = VtOrderReq()
-        req.symbol = symbol
+        idx = symbol.find(".")
+        if idx != -1:
+            req.symbol = symbol[0:idx]
+        else:
+            req.symbol = symbol
         req.exchange = exchange
         req.price = price
         req.volume = volume

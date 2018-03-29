@@ -178,7 +178,7 @@ class DataEngine(object):
         """更新合约数据"""
         contract = event.dict_['data']
         self.contractDict[contract.vtSymbol] = contract
-        self.contractDict[contract.symbol] = contract       # 使用常规代码（不包括交易所）可能导致重复
+        #self.contractDict[contract.symbol] = contract       # 使用常规代码（不包括交易所）可能导致重复
         
     def clearContract(self, event):
         self.contractDict.clear()
