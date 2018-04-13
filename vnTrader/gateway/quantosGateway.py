@@ -279,7 +279,7 @@ class QuantOSTdApi(object):
         
         symbols = ''
         for instcode in pf['security']:
-            if len(instcode) > 0:        
+            if len(instcode) > 0:		
                 symbols += str(instcode)
                 symbols += ","
         
@@ -604,7 +604,7 @@ class QuantOSTdApi(object):
     def qryPosition(self):
         """查询持仓"""
         df, msg = self.api.query_position()
-        
+		
         if not check_return_error(df, msg):
             self.writeLog(u'查询持仓失败，错误信息：%s' %msg)
             return False
@@ -651,7 +651,7 @@ class QuantOSTdApi(object):
     def qryAccount(self):
         
         df, msg = self.api.query_account()
-        
+		
         if not check_return_error(df, msg):
             self.writeLog(u'查询资金失败，错误信息：%s' %msg)
             return False
@@ -738,7 +738,7 @@ class QuantOSMdApi(object):
         self.setting = setting
         
     #----------------------------------------------------------------------
-    def onMarketData(self, key, data):    
+    def onMarketData(self, key, data):	
         """行情推送"""
         tick = VtTickData()
         tick.gatewayName = self.gatewayName
@@ -834,12 +834,15 @@ class QuantOSMdApi(object):
     #----------------------------------------------------------------------
     def queryInstruments(self, instcodes):
 
-        p = "symbol=%s" %instcodes
-        df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)
+        if instcodes == "":
+            df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter="market=SH,SZ,SHF,CZC,DCE,CFE&status=1&inst_type=1,2,3,4,5,101,102,103")
+        else:
+            p = "symbol=%s" %instcodes
+            df, msg = self.api.query("jz.instrumentInfo", fields="symbol, name, buylot, selllot, pricetick, multiplier, inst_type", filter=p)
         
         d = {}
         if df is None:
-            return {}
+		    return {}
 
         for i in range(len(df)):
             k = df.iloc[i]['symbol']
