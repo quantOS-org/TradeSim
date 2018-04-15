@@ -842,7 +842,7 @@ class QuantOSMdApi(object):
         
         d = {}
         if df is None:
-		    return {}
+            return {}
 
         for i in range(len(df)):
             k = df.iloc[i]['symbol']
