@@ -28,7 +28,7 @@ class VtGateway(object):
         self.eventEngine.put(event1)
         
         # 特定合约代码的事件
-        event2 = Event(type_=EVENT_TICK+tick.vtSymbol)
+        event2 = Event(type_=EVENT_TICK+tick.symbol)
         event2.dict_['data'] = tick
         self.eventEngine.put(event2)
     
@@ -41,7 +41,7 @@ class VtGateway(object):
         self.eventEngine.put(event1)
         
         # 特定合约的成交事件
-        event2 = Event(type_=EVENT_TRADE+trade.vtSymbol)
+        event2 = Event(type_=EVENT_TRADE+trade.symbol)
         event2.dict_['data'] = trade
         self.eventEngine.put(event2)        
     
@@ -67,7 +67,7 @@ class VtGateway(object):
         self.eventEngine.put(event1)
         
         # 特定合约代码的事件
-        event2 = Event(type_=EVENT_POSITION+position.vtSymbol)
+        event2 = Event(type_=EVENT_POSITION+position.symbol)
         event2.dict_['data'] = position
         self.eventEngine.put(event2)
     
@@ -186,8 +186,8 @@ class VtTickData(VtBaseData):
         # 代码相关
         self.symbol = EMPTY_STRING              # 合约代码
         self.exchange = EMPTY_STRING            # 交易所代码
-        self.vtSymbol = EMPTY_STRING            # 合约在vt系统中的唯一代码，通常是 合约代码.交易所代码
-        
+        self.name = EMPTY_STRING                # 代码名称
+
         # 成交数据
         self.lastPrice = EMPTY_FLOAT            # 最新成交价
         self.lastVolume = EMPTY_INT             # 最新成交量
@@ -245,8 +245,8 @@ class VtTradeData(VtBaseData):
         # 代码编号相关
         self.symbol = EMPTY_STRING              # 合约代码
         self.exchange = EMPTY_STRING            # 交易所代码
-        self.vtSymbol = EMPTY_STRING            # 合约在vt系统中的唯一代码，通常是 合约代码.交易所代码
-        
+        self.name = EMPTY_STRING                # 代码名称
+
         self.tradeID = EMPTY_STRING             # 成交编号
         self.vtTradeID = EMPTY_STRING           # 成交在vt系统中的唯一编号，通常是 Gateway名.成交编号
         
@@ -273,8 +273,8 @@ class VtOrderData(VtBaseData):
         # 代码编号相关
         self.symbol = EMPTY_STRING              # 合约代码
         self.exchange = EMPTY_STRING            # 交易所代码
-        self.vtSymbol = EMPTY_STRING            # 合约在vt系统中的唯一代码，通常是 合约代码.交易所代码
-        
+        self.name = EMPTY_STRING                # 代码名称
+
         self.orderID = EMPTY_STRING             # 订单编号
         self.vtOrderID = EMPTY_STRING           # 订单在vt系统中的唯一编号，通常是 Gateway名.订单编号
         self.taskID = EMPTY_STRING
@@ -310,14 +310,14 @@ class VtPositionData(VtBaseData):
         # 代码编号相关
         self.symbol = EMPTY_STRING              # 合约代码
         self.exchange = EMPTY_STRING            # 交易所代码
-        self.vtSymbol = EMPTY_STRING            # 合约在vt系统中的唯一代码，合约代码.交易所代码  
-        
+        self.name = EMPTY_STRING                # 代码名称
+
         # 持仓相关
         self.direction = EMPTY_STRING           # 持仓方向
         self.position = EMPTY_INT               # 持仓量
         self.frozen = EMPTY_INT                 # 冻结数量
         self.price = EMPTY_FLOAT                # 持仓均价
-        self.vtPositionName = EMPTY_STRING      # 持仓在vt系统中的唯一代码，通常是vtSymbol.方向
+        self.vtPositionName = EMPTY_STRING      # 持仓在vt系统中的唯一代码，symbol.方向
         
         # 20151020添加
         self.ydPosition = EMPTY_INT             # 昨持仓
@@ -396,9 +396,8 @@ class VtContractData(VtBaseData):
         """Constructor"""
         super(VtContractData, self).__init__()
         
-        self.symbol = EMPTY_STRING              # 代码
         self.exchange = EMPTY_STRING            # 交易所代码
-        self.vtSymbol = EMPTY_STRING            # 合约在vt系统中的唯一代码，通常是 合约代码.交易所代码
+        self.symbol = EMPTY_STRING              # 合约代码
         self.name = EMPTY_UNICODE               # 合约中文名
         
         self.productClass = EMPTY_UNICODE       # 合约类型

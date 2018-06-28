@@ -127,9 +127,9 @@ class MainEngine(object):
         self.eventEngine.put(event)        
     
     #----------------------------------------------------------------------
-    def getContract(self, vtSymbol):
+    def getContract(self, symbol):
         """查询合约"""
-        return self.dataEngine.getContract(vtSymbol)
+        return self.dataEngine.getContract(symbol)
     
     #----------------------------------------------------------------------
     def getAllContracts(self):
@@ -177,17 +177,16 @@ class DataEngine(object):
     def updateContract(self, event):
         """更新合约数据"""
         contract = event.dict_['data']
-        self.contractDict[contract.vtSymbol] = contract
-        #self.contractDict[contract.symbol] = contract       # 使用常规代码（不包括交易所）可能导致重复
-        
+        self.contractDict[contract.symbol] = contract
+
     def clearContract(self, event):
         self.contractDict.clear()
               
     #----------------------------------------------------------------------
-    def getContract(self, vtSymbol):
+    def getContract(self, symbol):
         """查询合约对象"""
         try:
-            return self.contractDict[vtSymbol]
+            return self.contractDict[symbol]
         except KeyError:
             return None
         

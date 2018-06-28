@@ -430,7 +430,8 @@ class BasicMonitor(QTableWidget):
     def initMenu(self):
         """初始化右键菜单"""
         self.menu = QMenu(self)
-        
+
+        '''
         saveAction = QAction(u'保存内容', self)
         saveAction.triggered.connect(self.saveToCsv)
         
@@ -439,7 +440,8 @@ class BasicMonitor(QTableWidget):
         
         self.menu.addAction(resizeAction)
         self.menu.addAction(saveAction)
-    
+        '''
+
     # ----------------------------------------------------------------------
     def contextMenuEvent(self, event):
         """右键点击事件"""
@@ -459,7 +461,7 @@ class MarketMonitor(BasicMonitor):
         # 设置表头有序字典
         d = OrderedDict()
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
-        d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
+        d['name'] = {'chinese': u'名称', 'cellType': NameCell}
         d['lastPrice'] = {'chinese': u'最新价', 'cellType': BasicCell}
         d['preClosePrice'] = {'chinese': u'昨收盘价', 'cellType': BasicCell}
         d['volume'] = {'chinese': u'成交量', 'cellType': NumCell}
@@ -478,7 +480,7 @@ class MarketMonitor(BasicMonitor):
         self.setHeaderDict(d)
         
         # 设置数据键
-        self.setDataKey('vtSymbol')
+        self.setDataKey('symbol')
         
         # 设置监控事件类型
         self.setEventType(EVENT_TICK, EVENT_CLEAR)
@@ -499,8 +501,8 @@ class MarketMonitor(BasicMonitor):
     def updateEvent(self, event):
         new_tick = event.dict_['data']
         
-        if new_tick.vtSymbol in self.dataDict:
-            old_tick = self.dataDict[new_tick.vtSymbol]['symbol'].data
+        if new_tick.symbol in self.dataDict:
+            old_tick = self.dataDict[new_tick.symbol]['symbol'].data
             new_tick.volchg = new_tick.volume - old_tick.volume if new_tick.volume > old_tick.volume else old_tick.volchg
         
         BasicMonitor.updateEvent(self, event)
@@ -564,7 +566,7 @@ class TradeMonitor(BasicMonitor):
         d['tradeID'] = {'chinese': u'成交编号', 'cellType': BasicCell}
         d['orderID'] = {'chinese': u'委托编号', 'cellType': BasicCell}
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
-        d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
+        d['name'] = {'chinese': u'名称', 'cellType': NameCell}
         d['direction'] = {'chinese': u'方向', 'cellType': DirectionCell}
         d['offset'] = {'chinese': u'开平', 'cellType': BasicCell}
         d['price'] = {'chinese': u'价格', 'cellType': BasicCell}
@@ -597,7 +599,7 @@ class OrderMonitor(BasicMonitor):
         d = OrderedDict()
         d['orderID'] = {'chinese': u'委托编号', 'cellType': BasicCell}
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
-        d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
+        d['name'] = {'chinese': u'名称', 'cellType': NameCell}
         d['priceType'] = {'chinese': u'算法', 'cellType': BasicCell}
         d['direction'] = {'chinese': u'方向', 'cellType': DirectionCell}
         d['offset'] = {'chinese': u'开平', 'cellType': BasicCell}
@@ -673,7 +675,7 @@ class PositionMonitor(BasicMonitor):
         
         d = OrderedDict()
         d['symbol'] = {'chinese': u'代码', 'cellType': BasicCell}
-        d['vtSymbol'] = {'chinese': u'名称', 'cellType': NameCell}
+        d['name'] = {'chinese': u'名称', 'cellType': NameCell}
         d['direction'] = {'chinese': u'方向', 'cellType': DirectionCell}
         d['initPosition'] = {'chinese': u'初持仓', 'cellType': PositionCell}
         d['position'] = {'chinese': u'总持仓', 'cellType': PositionCell}
@@ -1098,7 +1100,6 @@ class TradingWidget(QFrame):
         gatewayName = safeUnicode('quantos')
         
         # 查询合约
-        vtSymbol = symbol
         contract = self.mainEngine.getContract(symbol)
         
         # 清空价格数量
@@ -1106,7 +1107,6 @@ class TradingWidget(QFrame):
         self.spinVolume.setValue(0)
         
         if contract:
-            vtSymbol = contract.vtSymbol
             gatewayName = contract.gatewayName
             self.lineName.setText(contract.name)
             p = self.lineName.palette()
@@ -1161,35 +1161,42 @@ class TradingWidget(QFrame):
                 self.eventEngine.unregister(EVENT_TICK + self.symbol, self.signalemit)
             
             self.signalemit = self.signal.emit
-            self.eventEngine.register(EVENT_TICK + vtSymbol, self.signalemit)
+            self.eventEngine.register(EVENT_TICK + symbol, self.signalemit)
             
             # 订阅合约
-            self.mainEngine.subscribe(contract.vtSymbol, gatewayName)
+            self.mainEngine.subscribe(contract.symbol, gatewayName)
             
             # 更新组件当前交易的合约
-            self.symbol = vtSymbol
-    
+            self.symbol = symbol
+
+    # ----------------------------------------------------------------------
+    def format_price(self, price):
+        return int(price * 1000) / 1000
+
     # ----------------------------------------------------------------------
     def updateTick(self, event):
         """更新行情"""
         tick = event.dict_['data']
-        
-        if tick.vtSymbol == self.symbol:
-            self.labelBidPrice1.setText(str(tick.bidPrice1))
-            self.labelAskPrice1.setText(str(tick.askPrice1))
+
+        if tick.symbol == self.symbol:
+            contract = self.mainEngine.getContract(tick.symbol)
+            price_tick = contract.priceTick
+
+            self.labelBidPrice1.setText(str(self.format_price(tick.bidPrice1)))
+            self.labelAskPrice1.setText(str(self.format_price(tick.askPrice1)))
             self.labelBidVolume1.setText(str(tick.bidVolume1))
             self.labelAskVolume1.setText(str(tick.askVolume1))
             
             if tick.bidPrice2:
-                self.labelBidPrice2.setText(str(tick.bidPrice2))
-                self.labelBidPrice3.setText(str(tick.bidPrice3))
-                self.labelBidPrice4.setText(str(tick.bidPrice4))
-                self.labelBidPrice5.setText(str(tick.bidPrice5))
+                self.labelBidPrice2.setText(str(self.format_price(tick.bidPrice2)))
+                self.labelBidPrice3.setText(str(self.format_price(tick.bidPrice3)))
+                self.labelBidPrice4.setText(str(self.format_price(tick.bidPrice4)))
+                self.labelBidPrice5.setText(str(self.format_price(tick.bidPrice5)))
                 
-                self.labelAskPrice2.setText(str(tick.askPrice2))
-                self.labelAskPrice3.setText(str(tick.askPrice3))
-                self.labelAskPrice4.setText(str(tick.askPrice4))
-                self.labelAskPrice5.setText(str(tick.askPrice5))
+                self.labelAskPrice2.setText(str(self.format_price(tick.askPrice2)))
+                self.labelAskPrice3.setText(str(self.format_price(tick.askPrice3)))
+                self.labelAskPrice4.setText(str(self.format_price(tick.askPrice4)))
+                self.labelAskPrice5.setText(str(self.format_price(tick.askPrice5)))
                 
                 self.labelBidVolume2.setText(str(tick.bidVolume2))
                 self.labelBidVolume3.setText(str(tick.bidVolume3))
@@ -1201,7 +1208,7 @@ class TradingWidget(QFrame):
                 self.labelAskVolume4.setText(str(tick.askVolume4))
                 self.labelAskVolume5.setText(str(tick.askVolume5))
             
-            self.labelLastPrice.setText(str(tick.lastPrice))
+            self.labelLastPrice.setText(str(self.format_price(tick.lastPrice)))
             if self.spinPrice.value() < 0.000001 and tick.lastPrice > 0.000001:
                 self.spinPrice.setValue(tick.lastPrice)
             
@@ -1229,13 +1236,8 @@ class TradingWidget(QFrame):
             return
         
         # 查询合约
-        if exchange:
-            vtSymbol = '.'.join([symbol, exchange])
-            contract = self.mainEngine.getContract(vtSymbol)
-        else:
-            vtSymbol = symbol
-            contract = self.mainEngine.getContract(symbol)
-        
+        contract = self.mainEngine.getContract(symbol)
+
         if contract:
             gatewayName = contract.gatewayName
             exchange = contract.exchange  # 保证有交易所代码
@@ -1330,8 +1332,7 @@ class ContractMonitor(BasicMonitor):
         d = OrderedDict()
         d['symbol'] = {'chinese': u'合约代码', 'cellType': BasicCell}
         d['exchange'] = {'chinese': u'交易所', 'cellType': BasicCell}
-        d['vtSymbol'] = {'chinese': u'vt系统代码', 'cellType': BasicCell}
-        d['name'] = {'chinese': u'名称', 'cellType': BasicCell}
+        d['name'] = {'chinese': u'名称', 'cellType': NameCell}
         d['productClass'] = {'chinese': u'合约类型', 'cellType': BasicCell}
         d['size'] = {'chinese': u'合约乘数', 'cellType': BasicCell}
         d['lotsize'] = {'chinese': u'最小交易单位', 'cellType': BasicCell}
@@ -1349,7 +1350,7 @@ class ContractMonitor(BasicMonitor):
         self.initTable()
         
         # 设置数据键
-        self.setDataKey('vtSymbol')
+        self.setDataKey('')
         
         self.setSorting(False)
         

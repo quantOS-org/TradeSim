@@ -66,13 +66,11 @@ class MainWindow(QMainWindow):
         widgetPositionM, dockPositionM = self.createDock(wgs.PositionMonitor, u'持仓', QtCore.Qt.RightDockWidgetArea)
         
         widgetAccountM, dockAccountM = self.createDock(wgs.AccountMonitor, u'资金', QtCore.Qt.BottomDockWidgetArea)
-        widgetContractM, dockContractM = self.createDock(wgs.ContractMonitor, u'合约', QtCore.Qt.BottomDockWidgetArea)
         widgetLogM, dockLogM = self.createDock(wgs.LogMonitor, u'日志', QtCore.Qt.BottomDockWidgetArea)
         
         widgetTradeM, dockTradeM = self.createDock(wgs.TradeMonitor, u'成交', QtCore.Qt.BottomDockWidgetArea)
         widgetOrderM, dockOrderM = self.createDock(wgs.OrderMonitor, u'委托', QtCore.Qt.BottomDockWidgetArea)
         
-        self.tabifyDockWidget(dockContractM, dockTradeM)
         self.tabifyDockWidget(dockTradeM, dockOrderM)
         self.tabifyDockWidget(dockAccountM, dockLogM)
         
