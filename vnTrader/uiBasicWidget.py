@@ -839,7 +839,7 @@ class TradingWidget(QFrame):
         self.spinPrice = QDoubleSpinBox()
         self.spinPrice.setDecimals(4)
         self.spinPrice.setMinimum(0)
-        self.spinPrice.setMaximum(100000)
+        self.spinPrice.setMaximum(500000)
         
         self.spinVolume = QSpinBox()
         self.spinVolume.setMinimum(0)
