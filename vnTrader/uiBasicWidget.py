@@ -18,7 +18,7 @@ try:
 except ImportError:
     from PyQt5 import QtGui, QtCore
     from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QFrame, QLabel, QLineEdit, QComboBox, QDoubleSpinBox, \
-        QSpinBox, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QMenu, QAction, QHeaderView
+        QSpinBox, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QMenu, QAction, QHeaderView,QFileDialog
 
 from eventEngine import *
 from vtFunction import *
@@ -401,15 +401,15 @@ class BasicMonitor(QTableWidget):
         self.menu.close()
         
         # 获取想要保存的文件名
-        path = QtGui.QFileDialog.getSaveFileName(self, '保存数据', '', 'CSV(*.csv)')
+        path = QFileDialog.getSaveFileName(self, '保存数据', '', 'CSV(*.csv)')[0]
         
         try:
-            if not path.isEmpty():
-                with open(safeUnicode(path), 'wb') as f:
+            if path != '':
+                with open(safeUnicode(path), 'w') as f:
                     writer = csv.writer(f)
                     
                     # 保存标签
-                    headers = [header.encode('gbk') for header in self.headerList]
+                    headers = [header for header in self.headerList]
                     writer.writerow(headers)
                     
                     # 保存每行内容
@@ -419,7 +419,7 @@ class BasicMonitor(QTableWidget):
                             item = self.item(row, column)
                             if item is not None:
                                 rowdata.append(
-                                        safeUnicode(item.text()).encode('gbk'))
+                                        safeUnicode(item.text()))
                             else:
                                 rowdata.append('')
                         writer.writerow(rowdata)

@@ -594,7 +594,7 @@ class QuantOSTdApi(object):
         if not self.api:
             return
 
-        result, msg = self.api.cancel_order(cancelOrderReq.orderID)
+        taskid, msg = self.api.cancel_order(cancelOrderReq.orderID)
 
         if not check_return_error(result, msg):
             self.writeLog(u'撤单失败，错误信息：%s' %msg)
